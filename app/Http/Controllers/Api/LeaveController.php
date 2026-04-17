@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ApiResponse;
 use App\Models\LeaveRequest;
 use App\Models\LeaveType;
 use Illuminate\Http\Request;
 
 class LeaveController extends Controller
 {
+    use ApiResponse;
+
     public function index(Request $request)
     {
         $leaves = $request->user()
@@ -17,7 +20,7 @@ class LeaveController extends Controller
             ->latest()
             ->paginate(10);
 
-        return response()->json($leaves);
+        return $this->success($leaves, 'Leave requests retrieved.');
     }
 
     public function store(Request $request)
@@ -38,35 +41,35 @@ class LeaveController extends Controller
             'status'     => 'pending',
         ]);
 
-        return response()->json($leave->load('leaveType'), 201);
+        return $this->success($leave->load('leaveType'), 'Leave request submitted.', 201);
     }
 
     public function show(Request $request, LeaveRequest $leave)
     {
         if ($leave->user_id !== $request->user()->id) {
-            return response()->json(['message' => 'Forbidden.'], 403);
+            return $this->error('Forbidden.', 403);
         }
 
-        return response()->json($leave->load('leaveType'));
+        return $this->success($leave->load('leaveType'), 'Leave request retrieved.');
     }
 
     public function destroy(Request $request, LeaveRequest $leave)
     {
         if ($leave->user_id !== $request->user()->id) {
-            return response()->json(['message' => 'Forbidden.'], 403);
+            return $this->error('Forbidden.', 403);
         }
 
         if ($leave->status !== 'pending') {
-            return response()->json(['message' => 'Only pending requests can be cancelled.'], 422);
+            return $this->error('Only pending requests can be cancelled.', 422);
         }
 
         $leave->delete();
 
-        return response()->json(['message' => 'Leave request cancelled.']);
+        return $this->success(null, 'Leave request cancelled.');
     }
 
     public function leaveTypes()
     {
-        return response()->json(LeaveType::all());
+        return $this->success(LeaveType::all(), 'Leave types retrieved.');
     }
 }

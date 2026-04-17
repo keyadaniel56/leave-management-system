@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ApiResponse;
 use App\Models\LeaveRequest;
 use Illuminate\Http\Request;
 
 class LeaveController extends Controller
 {
+    use ApiResponse;
+
     public function index(Request $request)
     {
         $status = $request->query('status', 'pending');
@@ -17,18 +20,21 @@ class LeaveController extends Controller
             ->latest()
             ->paginate(15);
 
-        return response()->json($leaves);
+        return $this->success($leaves, 'Leave requests retrieved.');
     }
 
     public function show(LeaveRequest $leave)
     {
-        return response()->json($leave->load(['user', 'leaveType', 'reviewer']));
+        return $this->success(
+            $leave->load(['user', 'leaveType', 'reviewer']),
+            'Leave request retrieved.'
+        );
     }
 
     public function approve(Request $request, LeaveRequest $leave)
     {
         if ($leave->status !== 'pending') {
-            return response()->json(['message' => 'This request has already been reviewed.'], 422);
+            return $this->error('This request has already been reviewed.', 422);
         }
 
         $leave->update([
@@ -38,13 +44,13 @@ class LeaveController extends Controller
             'admin_note'  => $request->input('admin_note'),
         ]);
 
-        return response()->json(['message' => 'Leave request approved.', 'leave' => $leave]);
+        return $this->success($leave, 'Leave request approved.');
     }
 
     public function reject(Request $request, LeaveRequest $leave)
     {
         if ($leave->status !== 'pending') {
-            return response()->json(['message' => 'This request has already been reviewed.'], 422);
+            return $this->error('This request has already been reviewed.', 422);
         }
 
         $request->validate([
@@ -58,6 +64,6 @@ class LeaveController extends Controller
             'admin_note'  => $request->input('admin_note'),
         ]);
 
-        return response()->json(['message' => 'Leave request rejected.', 'leave' => $leave]);
+        return $this->success($leave, 'Leave request rejected.');
     }
 }
