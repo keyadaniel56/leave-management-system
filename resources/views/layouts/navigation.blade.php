@@ -15,6 +15,14 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+                    @if(Auth::user()->role === 'employee')
+                        <x-nav-link :href="route('leave.index')" :active="request()->routeIs('leave.*')">
+                            {{ __('My Leaves') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('leave.create')" :active="request()->routeIs('leave.create')">
+                            {{ __('Apply Leave') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -70,6 +78,14 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+            @if(Auth::user()->role === 'employee')
+                <x-responsive-nav-link :href="route('leave.index')" :active="request()->routeIs('leave.*')">
+                    {{ __('My Leaves') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('leave.create')" :active="request()->routeIs('leave.create')">
+                    {{ __('Apply Leave') }}
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->
