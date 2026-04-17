@@ -108,3 +108,65 @@ Visit `http://127.0.0.1:8000`
 - `users` — id, name, email, password, role (admin/employee)
 - `leave_types` — id, name, max_days
 - `leave_requests` — id, user_id, leave_type_id, start_date, end_date, total_days, reason, status, admin_note, reviewed_by, reviewed_at
+
+## REST API Endpoints (for React / mobile frontends)
+
+All API endpoints are prefixed with `/api`. Protected routes require:
+```
+Authorization: Bearer {token}
+```
+
+### Auth
+
+| Method | Endpoint        | Description              | Auth |
+|--------|-----------------|--------------------------|------|
+| POST   | /api/register   | Register new employee    | No   |
+| POST   | /api/login      | Login, returns token     | No   |
+| POST   | /api/logout     | Revoke current token     | Yes  |
+| GET    | /api/me         | Get authenticated user   | Yes  |
+
+### Employee
+
+| Method | Endpoint              | Description                  |
+|--------|-----------------------|------------------------------|
+| GET    | /api/leave-types      | List all leave types         |
+| GET    | /api/leaves           | My leave requests            |
+| POST   | /api/leaves           | Submit a leave request       |
+| GET    | /api/leaves/{id}      | View a single request        |
+| DELETE | /api/leaves/{id}      | Cancel a pending request     |
+
+### Admin
+
+| Method | Endpoint                          | Description              |
+|--------|-----------------------------------|--------------------------|
+| GET    | /api/admin/leaves                 | All leave requests       |
+| GET    | /api/admin/leaves/{id}            | Single leave request     |
+| POST   | /api/admin/leaves/{id}/approve    | Approve a request        |
+| POST   | /api/admin/leaves/{id}/reject     | Reject a request         |
+
+### Example: Login Request
+
+```json
+POST /api/login
+Content-Type: application/json
+
+{
+  "email": "admin@leave.com",
+  "password": "password"
+}
+```
+
+### Example: Submit Leave Request
+
+```json
+POST /api/leaves
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "leave_type_id": 1,
+  "start_date": "2026-05-01",
+  "end_date": "2026-05-05",
+  "reason": "Family vacation"
+}
+```
