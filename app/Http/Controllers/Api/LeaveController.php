@@ -45,7 +45,7 @@ class LeaveController extends Controller
         $leave->load('leaveType', 'user');
         broadcast(new LeaveRequestSubmitted($leave))->toOthers();
 
-        return $this->success($leave->load('leaveType'), 'Leave request submitted.', 201);
+        return $this->success($leave, 'Leave request submitted.', 201);
     }
 
     public function show(Request $request, LeaveRequest $leave)
@@ -74,6 +74,6 @@ class LeaveController extends Controller
 
     public function leaveTypes()
     {
-        return $this->success(LeaveType::all(), 'Leave types retrieved.');
+        return $this->success(LeaveType::orderBy('name')->get(), 'Leave types retrieved.');
     }
 }

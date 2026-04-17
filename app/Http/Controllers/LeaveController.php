@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\LeaveRequestSubmitted;
 use App\Models\LeaveRequest;
 use App\Models\LeaveType;
 use Illuminate\Http\Request;
@@ -37,11 +38,14 @@ class LeaveController extends Controller
         $totalDays = (int) now()->parse($validated['start_date'])
             ->diffInWeekdays(now()->parse($validated['end_date'])) + 1;
 
-        $request->user()->leaveRequests()->create([
+        $leave = $request->user()->leaveRequests()->create([
             ...$validated,
             'total_days' => $totalDays,
             'status'     => 'pending',
         ]);
+
+        $leave->load('leaveType', 'user');
+        broadcast(new LeaveRequestSubmitted($leave))->toOthers();
 
         return redirect()->route('leave.index')
             ->with('success', 'Leave request submitted successfully.');

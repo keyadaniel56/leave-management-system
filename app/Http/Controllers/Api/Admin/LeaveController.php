@@ -16,6 +16,11 @@ class LeaveController extends Controller
     {
         $status = $request->query('status', 'pending');
 
+        $validStatuses = ['pending', 'approved', 'rejected', 'all'];
+        if (!in_array($status, $validStatuses)) {
+            $status = 'pending';
+        }
+
         $leaves = LeaveRequest::with(['user', 'leaveType'])
             ->when($status !== 'all', fn($q) => $q->where('status', $status))
             ->latest()
