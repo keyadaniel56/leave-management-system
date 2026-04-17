@@ -1,0 +1,65 @@
+@startuml Class Diagram
+
+class User {
+  +id : int
+  +name : string
+  +email : string
+  +password : string
+  +role : string
+  +created_at : timestamp
+  +updated_at : timestamp
+  --
+  +leaveRequests() : HasMany
+  +isAdmin() : bool
+}
+
+class LeaveType {
+  +id : int
+  +name : string
+  +max_days : int
+  +created_at : timestamp
+  +updated_at : timestamp
+  --
+  +leaveRequests() : HasMany
+}
+
+class LeaveRequest {
+  +id : int
+  +user_id : int
+  +leave_type_id : int
+  +start_date : date
+  +end_date : date
+  +total_days : int
+  +reason : string
+  +status : string
+  +admin_note : string
+  +reviewed_by : int
+  +reviewed_at : timestamp
+  +created_at : timestamp
+  +updated_at : timestamp
+  --
+  +user() : BelongsTo
+  +leaveType() : BelongsTo
+  +reviewer() : BelongsTo
+}
+
+class LeaveBalance {
+  +id : int
+  +user_id : int
+  +leave_type_id : int
+  +year : int
+  +total_days : int
+  +used_days : int
+  +remaining_days : int
+  --
+  +user() : BelongsTo
+  +leaveType() : BelongsTo
+}
+
+User "1" --> "0..*" LeaveRequest : submits
+User "1" --> "0..*" LeaveBalance : has
+LeaveType "1" --> "0..*" LeaveRequest : categorizes
+LeaveType "1" --> "0..*" LeaveBalance : tracks
+User "1" --> "0..*" LeaveRequest : reviews
+
+@enduml

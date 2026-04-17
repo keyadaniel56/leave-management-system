@@ -1,0 +1,43 @@
+@startuml Sequence Diagram - Leave Request Flow
+
+actor Employee
+participant "Browser" as Browser
+participant "LeaveController" as LC
+participant "LeaveRequest" as LR
+participant "Database" as DB
+actor Admin
+
+Employee -> Browser : Fill leave application form
+Browser -> LC : POST /leave/apply
+LC -> LC : Validate input
+LC -> LR : create(status=pending)
+LR -> DB : INSERT leave_requests
+DB --> LR : saved
+LR --> LC : LeaveRequest instance
+LC --> Browser : Redirect with success
+Browser --> Employee : Leave request submitted
+
+note over DB : status = pending
+
+Admin -> Browser : View pending requests
+Browser -> LC : GET /admin/leaves
+LC -> DB : SELECT pending requests
+DB --> LC : results
+LC --> Browser : Render list
+Browser --> Admin : View requests
+
+Admin -> Browser : Approve or Reject
+Browser -> LC : POST /admin/leaves/{id}/update
+LC -> DB : UPDATE status, reviewed_by, reviewed_at
+DB --> LC : updated
+LC --> Browser : Redirect with confirmation
+Browser --> Admin : Request updated
+
+Employee -> Browser : View leave history
+Browser -> LC : GET /leave/history
+LC -> DB : SELECT WHERE user_id = ?
+DB --> LC : records
+LC --> Browser : Render history
+Browser --> Employee : View status
+
+@enduml

@@ -1,0 +1,40 @@
+@startuml Activity Diagram - Leave Application
+
+start
+
+:Employee logs in;
+:Navigate to Apply Leave page;
+:Fill in leave form (type, dates, reason);
+
+if (Form valid?) then (yes)
+  :Calculate total days;
+  if (Sufficient leave balance?) then (yes)
+    :Save LeaveRequest with status = pending;
+    :Show success message;
+  else (no)
+    :Show insufficient balance error;
+    stop
+  endif
+else (no)
+  :Show validation errors;
+  stop
+endif
+
+:Admin logs in;
+:View pending leave requests;
+:Select a leave request;
+
+if (Decision?) then (Approve)
+  :Set status = approved;
+  :Record reviewed_by and reviewed_at;
+else (Reject)
+  :Set status = rejected;
+  :Add optional admin note;
+  :Record reviewed_by and reviewed_at;
+endif
+
+:Employee views updated leave history;
+
+stop
+
+@enduml
