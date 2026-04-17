@@ -23,6 +23,11 @@
                             {{ __('Apply Leave') }}
                         </x-nav-link>
                     @endif
+                    @if(Auth::user()->role === 'admin')
+                        <x-nav-link :href="route('admin.leaves.index')" :active="request()->routeIs('admin.leaves.*')">
+                            {{ __('Leave Requests') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -84,6 +89,11 @@
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('leave.create')" :active="request()->routeIs('leave.create')">
                     {{ __('Apply Leave') }}
+                </x-responsive-nav-link>
+            @endif
+            @if(Auth::user()->role === 'admin')
+                <x-responsive-nav-link :href="route('admin.leaves.index')" :active="request()->routeIs('admin.leaves.*')">
+                    {{ __('Leave Requests') }}
                 </x-responsive-nav-link>
             @endif
         </div>

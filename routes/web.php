@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\LeaveController as AdminLeaveController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\ProfileController;
@@ -19,6 +20,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/leave/create', [LeaveController::class, 'create'])->name('leave.create');
         Route::post('/leave', [LeaveController::class, 'store'])->name('leave.store');
         Route::delete('/leave/{leave}', [LeaveController::class, 'destroy'])->name('leave.destroy');
+    });
+
+    // Admin routes
+    Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/leaves', [AdminLeaveController::class, 'index'])->name('leaves.index');
+        Route::get('/leaves/{leave}', [AdminLeaveController::class, 'show'])->name('leaves.show');
+        Route::post('/leaves/{leave}/approve', [AdminLeaveController::class, 'approve'])->name('leaves.approve');
+        Route::post('/leaves/{leave}/reject', [AdminLeaveController::class, 'reject'])->name('leaves.reject');
     });
 });
 
