@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\LeaveRequestSubmitted;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\ApiResponse;
 use App\Models\LeaveRequest;
@@ -40,6 +41,9 @@ class LeaveController extends Controller
             'total_days' => $totalDays,
             'status'     => 'pending',
         ]);
+
+        $leave->load('leaveType', 'user');
+        broadcast(new LeaveRequestSubmitted($leave))->toOthers();
 
         return $this->success($leave->load('leaveType'), 'Leave request submitted.', 201);
     }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
+use App\Events\LeaveRequestReviewed;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\ApiResponse;
 use App\Models\LeaveRequest;
@@ -44,6 +45,9 @@ class LeaveController extends Controller
             'admin_note'  => $request->input('admin_note'),
         ]);
 
+        $leave->load('leaveType', 'user');
+        broadcast(new LeaveRequestReviewed($leave));
+
         return $this->success($leave, 'Leave request approved.');
     }
 
@@ -63,6 +67,9 @@ class LeaveController extends Controller
             'reviewed_at' => now(),
             'admin_note'  => $request->input('admin_note'),
         ]);
+
+        $leave->load('leaveType', 'user');
+        broadcast(new LeaveRequestReviewed($leave));
 
         return $this->success($leave, 'Leave request rejected.');
     }

@@ -52,6 +52,10 @@ echo "    Email:    admin@leave.com"
 echo "    Password: password"
 echo ""
 echo "  API base URL: http://127.0.0.1:8000/api"
+echo "  WebSocket:    ws://127.0.0.1:8080"
+echo ""
+echo "  NOTE: Open a second terminal and run:"
+echo "    php artisan reverb:start"
 echo ""
 
 # Start the server
