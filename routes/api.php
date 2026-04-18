@@ -7,8 +7,9 @@ use App\Http\Controllers\Api\Admin\LeaveTypeController as AdminLeaveTypeControll
 use Illuminate\Support\Facades\Route;
 
 // Public auth routes
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login',    [AuthController::class, 'login']);
+Route::post('/register',       [AuthController::class, 'register']);
+Route::post('/register/admin', [AuthController::class, 'registerAdmin']);
+Route::post('/login',          [AuthController::class, 'login']);
 
 // Authenticated routes
 Route::middleware('auth:sanctum')->group(function () {

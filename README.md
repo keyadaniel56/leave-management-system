@@ -230,12 +230,13 @@ All responses follow this structure:
 
 ### Auth Endpoints
 
-| Method | Endpoint       | Description            | Auth |
-|--------|----------------|------------------------|------|
-| POST   | /api/register  | Register as employee   | No   |
-| POST   | /api/login     | Login, returns token   | No   |
-| POST   | /api/logout    | Revoke current token   | Yes  |
-| GET    | /api/me        | Get authenticated user | Yes  |
+| Method | Endpoint              | Description                        | Auth |
+|--------|-----------------------|------------------------------------|------|
+| POST   | /api/register         | Register as employee               | No   |
+| POST   | /api/register/admin   | Register as admin (secret required)| No   |
+| POST   | /api/login            | Login, returns token               | No   |
+| POST   | /api/logout           | Revoke current token               | Yes  |
+| GET    | /api/me               | Get authenticated user             | Yes  |
 
 ### Employee Endpoints
 
@@ -263,6 +264,19 @@ All responses follow this structure:
 ---
 
 ## API Usage Examples
+
+### Register as Admin
+```bash
+curl -X POST http://127.0.0.1:8000/api/register/admin \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Admin User",
+    "email": "admin2@example.com",
+    "password": "password",
+    "password_confirmation": "password",
+    "admin_secret": "your_admin_secret_key_here"
+  }'
+```
 
 ### Register
 ```bash

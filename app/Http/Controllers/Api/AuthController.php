@@ -34,6 +34,31 @@ class AuthController extends Controller
         return $this->success(['user' => $user, 'token' => $token], 'Registration successful.', 201);
     }
 
+    public function registerAdmin(Request $request)
+    {
+        $request->validate([
+            'name'           => 'required|string|max:255',
+            'email'          => 'required|email|unique:users,email',
+            'password'       => ['required', 'confirmed', Password::defaults()],
+            'admin_secret'   => 'required|string',
+        ]);
+
+        if ($request->admin_secret !== config('app.admin_registration_secret')) {
+            return $this->error('Invalid admin secret key.', 403);
+        }
+
+        $user = User::create([
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'password' => Hash::make($request->password),
+            'role'     => 'admin',
+        ]);
+
+        $token = $user->createToken('api-token')->plainTextToken;
+
+        return $this->success(['user' => $user, 'token' => $token], 'Admin registered successfully.', 201);
+    }
+
     public function login(Request $request)
     {
         $request->validate([
