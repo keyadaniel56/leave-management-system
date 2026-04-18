@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\LeaveController as AdminLeaveController;
+use App\Http\Controllers\Admin\LeaveTypeController as AdminLeaveTypeController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LeaveController;
@@ -32,6 +33,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
         Route::get('/users/{user}', [AdminUserController::class, 'show'])->name('users.show');
+
+        Route::get('/leave-types', [AdminLeaveTypeController::class, 'index'])->name('leave-types.index');
+        Route::post('/leave-types', [AdminLeaveTypeController::class, 'store'])->name('leave-types.store');
+        Route::put('/leave-types/{leaveType}', [AdminLeaveTypeController::class, 'update'])->name('leave-types.update');
+        Route::delete('/leave-types/{leaveType}', [AdminLeaveTypeController::class, 'destroy'])->name('leave-types.destroy');
     });
 });
 

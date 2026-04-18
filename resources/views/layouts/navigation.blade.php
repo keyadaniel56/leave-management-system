@@ -30,6 +30,9 @@
                         <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
                             {{ __('Employees') }}
                         </x-nav-link>
+                        <x-nav-link :href="route('admin.leave-types.index')" :active="request()->routeIs('admin.leave-types.*')">
+                            {{ __('Leave Types') }}
+                        </x-nav-link>
                     @endif
                 </div>
             </div>
@@ -100,6 +103,9 @@
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
                     {{ __('Employees') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('admin.leave-types.index')" :active="request()->routeIs('admin.leave-types.*')">
+                    {{ __('Leave Types') }}
                 </x-responsive-nav-link>
             @endif
         </div>

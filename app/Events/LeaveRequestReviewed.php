@@ -18,6 +18,7 @@ class LeaveRequestReviewed implements ShouldBroadcast
     }
 
     public function broadcastOn(): array
+    
     {
         // Broadcast to the specific employee's private channel
         return [new Channel('employee.' . $this->leaveRequest->user_id)];
