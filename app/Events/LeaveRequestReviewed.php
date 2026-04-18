@@ -3,8 +3,8 @@
 namespace App\Events;
 
 use App\Models\LeaveRequest;
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -18,10 +18,8 @@ class LeaveRequestReviewed implements ShouldBroadcast
     }
 
     public function broadcastOn(): array
-    
     {
-        // Broadcast to the specific employee's private channel
-        return [new Channel('employee.' . $this->leaveRequest->user_id)];
+        return [new PrivateChannel('employee.' . $this->leaveRequest->user_id)];
     }
 
     public function broadcastAs(): string

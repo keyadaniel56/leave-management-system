@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Events\LeaveRequestReviewed;
 use App\Http\Controllers\Controller;
+use App\Models\LeaveBalance;
 use App\Models\LeaveRequest;
 use Illuminate\Http\Request;
 
@@ -12,6 +13,11 @@ class LeaveController extends Controller
     public function index(Request $request)
     {
         $status = $request->query('status', 'pending');
+
+        $validStatuses = ['pending', 'approved', 'rejected', 'all'];
+        if (!in_array($status, $validStatuses)) {
+            $status = 'pending';
+        }
 
         $leaves = LeaveRequest::with(['user', 'leaveType'])
             ->when($status !== 'all', fn($q) => $q->where('status', $status))
@@ -39,6 +45,12 @@ class LeaveController extends Controller
             'reviewed_at' => now(),
             'admin_note'  => $request->input('admin_note'),
         ]);
+
+        // Deduct from leave balance
+        LeaveBalance::where('user_id', $leave->user_id)
+            ->where('leave_type_id', $leave->leave_type_id)
+            ->where('year', $leave->start_date->year)
+            ->increment('used_days', $leave->total_days);
 
         $leave->load('leaveType', 'user');
         broadcast(new LeaveRequestReviewed($leave));

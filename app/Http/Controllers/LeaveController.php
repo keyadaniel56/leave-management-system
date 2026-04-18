@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\LeaveRequestSubmitted;
+use App\Models\LeaveBalance;
 use App\Models\LeaveRequest;
 use App\Models\LeaveType;
 use Illuminate\Http\Request;
@@ -22,7 +23,7 @@ class LeaveController extends Controller
 
     public function create()
     {
-        $leaveTypes = LeaveType::all();
+        $leaveTypes = LeaveType::orderBy('name')->get();
         return view('leave.create', compact('leaveTypes'));
     }
 
@@ -37,6 +38,17 @@ class LeaveController extends Controller
 
         $totalDays = (int) now()->parse($validated['start_date'])
             ->diffInWeekdays(now()->parse($validated['end_date'])) + 1;
+
+        // Check leave balance
+        $balance = LeaveBalance::where('user_id', $request->user()->id)
+            ->where('leave_type_id', $validated['leave_type_id'])
+            ->where('year', now()->year)
+            ->first();
+
+        if (!$balance || !$balance->hasEnoughDays($totalDays)) {
+            return back()->withInput()
+                ->with('error', 'Insufficient leave balance for the requested days.');
+        }
 
         $leave = $request->user()->leaveRequests()->create([
             ...$validated,
