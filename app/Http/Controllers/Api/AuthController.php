@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\ApiResponse;
 use App\Models\User;
+use App\Services\LeaveBalanceService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
@@ -30,6 +31,9 @@ class AuthController extends Controller
         ]);
 
         $token = $user->createToken('api-token')->plainTextToken;
+
+        // Seed leave balances for new employee
+        app(LeaveBalanceService::class)->seedBalancesForUser($user);
 
         return $this->success(['user' => $user, 'token' => $token], 'Registration successful.', 201);
     }

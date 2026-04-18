@@ -46,4 +46,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(LeaveRequest::class, 'reviewed_by');
     }
+
+    public function leaveBalances(): HasMany
+    {
+        return $this->hasMany(LeaveBalance::class);
+    }
 }

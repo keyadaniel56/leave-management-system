@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Events\LeaveRequestReviewed;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\ApiResponse;
+use App\Models\LeaveBalance;
 use App\Models\LeaveRequest;
 use Illuminate\Http\Request;
 
@@ -49,6 +50,12 @@ class LeaveController extends Controller
             'reviewed_at' => now(),
             'admin_note'  => $request->input('admin_note'),
         ]);
+
+        // Deduct from leave balance
+        LeaveBalance::where('user_id', $leave->user_id)
+            ->where('leave_type_id', $leave->leave_type_id)
+            ->where('year', $leave->start_date->year)
+            ->increment('used_days', $leave->total_days);
 
         $leave->load('leaveType', 'user');
         broadcast(new LeaveRequestReviewed($leave));

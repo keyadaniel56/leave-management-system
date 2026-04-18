@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Events\LeaveRequestSubmitted;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\ApiResponse;
+use App\Models\LeaveBalance;
 use App\Models\LeaveRequest;
 use App\Models\LeaveType;
 use Illuminate\Http\Request;
@@ -35,6 +36,16 @@ class LeaveController extends Controller
 
         $totalDays = (int) now()->parse($validated['start_date'])
             ->diffInWeekdays(now()->parse($validated['end_date'])) + 1;
+
+        // Check leave balance
+        $balance = LeaveBalance::where('user_id', $request->user()->id)
+            ->where('leave_type_id', $validated['leave_type_id'])
+            ->where('year', now()->year)
+            ->first();
+
+        if (!$balance || !$balance->hasEnoughDays($totalDays)) {
+            return $this->error('Insufficient leave balance for the requested days.', 422);
+        }
 
         $leave = $request->user()->leaveRequests()->create([
             ...$validated,
@@ -75,5 +86,21 @@ class LeaveController extends Controller
     public function leaveTypes()
     {
         return $this->success(LeaveType::orderBy('name')->get(), 'Leave types retrieved.');
+    }
+
+    public function balance(Request $request)
+    {
+        $balances = LeaveBalance::where('user_id', $request->user()->id)
+            ->where('year', now()->year)
+            ->with('leaveType')
+            ->get()
+            ->map(fn($b) => [
+                'leave_type'     => $b->leaveType->name,
+                'total_days'     => $b->total_days,
+                'used_days'      => $b->used_days,
+                'remaining_days' => $b->remaining_days,
+            ]);
+
+        return $this->success($balances, 'Leave balances retrieved.');
     }
 }

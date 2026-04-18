@@ -59,11 +59,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Employee routes
     Route::middleware('role:employee')->group(function () {
-        Route::get('/leave-types',   [LeaveController::class, 'leaveTypes']);
-        Route::get('/leaves',        [LeaveController::class, 'index']);
-        Route::post('/leaves',       [LeaveController::class, 'store']);
-        Route::get('/leaves/{leave}', [LeaveController::class, 'show']);
+        Route::get('/leave-types',       [LeaveController::class, 'leaveTypes']);
+        Route::get('/leaves',            [LeaveController::class, 'index']);
+        Route::post('/leaves',           [LeaveController::class, 'store']);
+        Route::get('/leaves/{leave}',    [LeaveController::class, 'show']);
         Route::delete('/leaves/{leave}', [LeaveController::class, 'destroy']);
+        Route::get('/leave-balance',     [LeaveController::class, 'balance']);
     });
 
     // Admin routes
