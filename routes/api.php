@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\LeaveController;
 use App\Http\Controllers\Api\Admin\LeaveController as AdminLeaveController;
+use App\Http\Controllers\Api\Admin\LeaveTypeController as AdminLeaveTypeController;
 use Illuminate\Support\Facades\Route;
 
 // Public auth routes
@@ -30,6 +31,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/leaves/{leave}',            [AdminLeaveController::class, 'show']);
         Route::post('/leaves/{leave}/approve',   [AdminLeaveController::class, 'approve']);
         Route::post('/leaves/{leave}/reject',    [AdminLeaveController::class, 'reject']);
+
+        Route::get('/leave-types',               [AdminLeaveTypeController::class, 'index']);
+        Route::post('/leave-types',              [AdminLeaveTypeController::class, 'store']);
+        Route::put('/leave-types/{leaveType}',   [AdminLeaveTypeController::class, 'update']);
+        Route::delete('/leave-types/{leaveType}',[AdminLeaveTypeController::class, 'destroy']);
     });
 
 });

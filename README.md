@@ -203,6 +203,10 @@ Visit `http://127.0.0.1:8000`
 | POST   | /admin/leaves/{id}/reject     | Reject leave request         | Admin    |
 | GET    | /admin/users                  | List all employees           | Admin    |
 | GET    | /admin/users/{id}             | Employee leave history       | Admin    |
+| GET    | /admin/leave-types            | Manage leave types           | Admin    |
+| POST   | /admin/leave-types            | Add a new leave type         | Admin    |
+| PUT    | /admin/leave-types/{id}       | Update a leave type          | Admin    |
+| DELETE | /admin/leave-types/{id}       | Delete a leave type          | Admin    |
 
 ---
 
@@ -251,6 +255,10 @@ All responses follow this structure:
 | GET    | /api/admin/leaves/{id}          | Single leave request  |
 | POST   | /api/admin/leaves/{id}/approve  | Approve a request     |
 | POST   | /api/admin/leaves/{id}/reject   | Reject a request      |
+| GET    | /api/admin/leave-types          | List all leave types  |
+| POST   | /api/admin/leave-types          | Create a leave type   |
+| PUT    | /api/admin/leave-types/{id}     | Update a leave type   |
+| DELETE | /api/admin/leave-types/{id}     | Delete a leave type   |
 
 ---
 
