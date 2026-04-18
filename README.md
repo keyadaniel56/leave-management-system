@@ -362,3 +362,57 @@ routes/
 ├── api.php
 └── web.php
 ```
+
+---
+
+## Running Tests
+
+### Setup test database
+
+```bash
+sudo mysql -e "CREATE DATABASE leave_management_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+sudo mysql -e "GRANT ALL PRIVILEGES ON leave_management_test.* TO 'your_db_user'@'localhost';"
+sudo mysql -e "FLUSH PRIVILEGES;"
+```
+
+### Run all tests
+
+```bash
+php artisan test
+```
+
+### Run only leave system tests
+
+```bash
+php artisan test --filter=LeaveRequestTest
+```
+
+### Run with detailed output
+
+```bash
+php artisan test --verbose
+```
+
+### Expected output
+
+```
+PASS  Tests\Feature\LeaveRequestTest
+✓ employee can submit leave request
+✓ employee cannot submit leave with invalid dates
+✓ employee cannot submit leave with end before start
+✓ employee cannot submit leave with insufficient balance
+✓ employee can view their leave history
+✓ employee can cancel pending leave
+✓ employee cannot cancel approved leave
+✓ admin can approve leave request
+✓ admin can reject leave request
+✓ admin cannot approve already reviewed request
+✓ employee cannot access admin routes
+✓ admin cannot access employee leave submit
+✓ unauthenticated user cannot access protected routes
+✓ employee can view leave balance
+✓ leave balance decreases after approval
+✓ remaining days calculated correctly
+
+Tests: 16 passed (31 assertions)
+```
