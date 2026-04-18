@@ -36,11 +36,16 @@ class AuthController extends Controller
 
     public function registerAdmin(Request $request)
     {
+        // Disable endpoint once an admin already exists
+        if (User::where('role', 'admin')->exists()) {
+            abort(404);
+        }
+
         $request->validate([
-            'name'           => 'required|string|max:255',
-            'email'          => 'required|email|unique:users,email',
-            'password'       => ['required', 'confirmed', Password::defaults()],
-            'admin_secret'   => 'required|string',
+            'name'         => 'required|string|max:255',
+            'email'        => 'required|email|unique:users,email',
+            'password'     => ['required', 'confirmed', Password::defaults()],
+            'admin_secret' => 'required|string',
         ]);
 
         if ($request->admin_secret !== config('app.admin_registration_secret')) {

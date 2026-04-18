@@ -230,13 +230,13 @@ All responses follow this structure:
 
 ### Auth Endpoints
 
-| Method | Endpoint              | Description                        | Auth |
-|--------|-----------------------|------------------------------------|------|
-| POST   | /api/register         | Register as employee               | No   |
-| POST   | /api/register/admin   | Register as admin (secret required)| No   |
-| POST   | /api/login            | Login, returns token               | No   |
-| POST   | /api/logout           | Revoke current token               | Yes  |
-| GET    | /api/me               | Get authenticated user             | Yes  |
+| Method | Endpoint              | Description                                      | Auth |
+|--------|-----------------------|--------------------------------------------------|------|
+| POST   | /api/register         | Register as employee                             | No   |
+| POST   | /api/auth/provision   | Register first admin (secret + rate limited)     | No   |
+| POST   | /api/login            | Login, returns token                             | No   |
+| POST   | /api/logout           | Revoke current token                             | Yes  |
+| GET    | /api/me               | Get authenticated user                           | Yes  |
 
 ### Employee Endpoints
 
@@ -267,7 +267,7 @@ All responses follow this structure:
 
 ### Register as Admin
 ```bash
-curl -X POST http://127.0.0.1:8000/api/register/admin \
+curl -X POST http://127.0.0.1:8000/api/auth/provision \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Admin User",
@@ -277,6 +277,7 @@ curl -X POST http://127.0.0.1:8000/api/register/admin \
     "admin_secret": "your_admin_secret_key_here"
   }'
 ```
+> Note: This endpoint is rate-limited to 3 requests per minute and automatically returns 404 once an admin account exists.
 
 ### Register
 ```bash
