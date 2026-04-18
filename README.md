@@ -237,6 +237,8 @@ All responses follow this structure:
 | POST   | /api/login            | Login, returns token                             | No   |
 | POST   | /api/logout           | Revoke current token                             | Yes  |
 | GET    | /api/me               | Get authenticated user                           | Yes  |
+| POST   | /api/forgot-password  | Send password reset link to email                | No   |
+| POST   | /api/reset-password   | Reset password using token from email            | No   |
 
 ### Employee Endpoints
 

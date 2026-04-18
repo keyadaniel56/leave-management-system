@@ -4,12 +4,52 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\LeaveController;
 use App\Http\Controllers\Api\Admin\LeaveController as AdminLeaveController;
 use App\Http\Controllers\Api\Admin\LeaveTypeController as AdminLeaveTypeController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Support\Str;
 
 // Public auth routes
 Route::post('/register',        [AuthController::class, 'register']);
 Route::post('/auth/provision',  [AuthController::class, 'registerAdmin'])->middleware('throttle:3,1');
 Route::post('/login',           [AuthController::class, 'login']);
+
+// Password reset
+Route::post('/forgot-password', function (Request $request) {
+    $request->validate(['email' => 'required|email']);
+
+    $status = Password::sendResetLink($request->only('email'));
+
+    return $status === Password::RESET_LINK_SENT
+        ? response()->json(['status' => 'success', 'message' => 'Password reset link sent to your email.'])
+        : response()->json(['status' => 'error', 'message' => 'Unable to send reset link. Check the email address.'], 422);
+})->middleware('throttle:5,1')->name('password.email');
+
+Route::post('/reset-password', function (Request $request) {
+    $request->validate([
+        'token'    => 'required',
+        'email'    => 'required|email',
+        'password' => 'required|confirmed|min:8',
+    ]);
+
+    $status = Password::reset(
+        $request->only('email', 'password', 'password_confirmation', 'token'),
+        function ($user, $password) {
+            $user->forceFill([
+                'password'       => Hash::make($password),
+                'remember_token' => Str::random(60),
+            ])->save();
+
+            event(new PasswordReset($user));
+        }
+    );
+
+    return $status === Password::PASSWORD_RESET
+        ? response()->json(['status' => 'success', 'message' => 'Password reset successfully.'])
+        : response()->json(['status' => 'error', 'message' => 'Invalid or expired reset token.'], 422);
+})->middleware('throttle:5,1')->name('password.reset');
 
 // Authenticated routes
 Route::middleware('auth:sanctum')->group(function () {
