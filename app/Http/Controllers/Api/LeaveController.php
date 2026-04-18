@@ -9,21 +9,22 @@ use App\Models\LeaveBalance;
 use App\Models\LeaveRequest;
 use App\Models\LeaveType;
 use Illuminate\Http\Request;
+use OpenApi\Attributes as OA;
 
 class LeaveController extends Controller
 {
     use ApiResponse;
 
-    /**
-     * @OA\Get(
-     *     path="/api/leaves",
-     *     tags={"Leaves"},
-     *     summary="Get my leave requests",
-     *     security={{"bearerAuth":{}}},
-     *     @OA\Response(response=200, description="Leave requests retrieved"),
-     *     @OA\Response(response=403, description="Forbidden")
-     * )
-     */
+    #[OA\Get(
+        path: '/api/leaves',
+        summary: 'Get my leave requests',
+        security: [['bearerAuth' => []]],
+        tags: ['Leaves'],
+        responses: [
+            new OA\Response(response: 200, description: 'Leave requests retrieved'),
+            new OA\Response(response: 403, description: 'Forbidden'),
+        ]
+    )]
     public function index(Request $request)
     {
         $leaves = $request->user()
@@ -35,27 +36,29 @@ class LeaveController extends Controller
         return $this->success($leaves, 'Leave requests retrieved.');
     }
 
-    /**
-     * @OA\Post(
-     *     path="/api/leaves",
-     *     tags={"Leaves"},
-     *     summary="Submit a leave request",
-     *     security={{"bearerAuth":{}}},
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             required={"leave_type_id","start_date","end_date","reason"},
-     *             @OA\Property(property="leave_type_id", type="integer", example=1),
-     *             @OA\Property(property="start_date", type="string", format="date", example="2026-05-01"),
-     *             @OA\Property(property="end_date", type="string", format="date", example="2026-05-05"),
-     *             @OA\Property(property="reason", type="string", example="Family vacation")
-     *         )
-     *     ),
-     *     @OA\Response(response=201, description="Leave request submitted"),
-     *     @OA\Response(response=422, description="Validation error or insufficient balance"),
-     *     @OA\Response(response=403, description="Forbidden")
-     * )
-     */
+    #[OA\Post(
+        path: '/api/leaves',
+        summary: 'Submit a leave request',
+        security: [['bearerAuth' => []]],
+        tags: ['Leaves'],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['leave_type_id', 'start_date', 'end_date', 'reason'],
+                properties: [
+                    new OA\Property(property: 'leave_type_id', type: 'integer', example: 1),
+                    new OA\Property(property: 'start_date', type: 'string', format: 'date', example: '2026-05-01'),
+                    new OA\Property(property: 'end_date', type: 'string', format: 'date', example: '2026-05-05'),
+                    new OA\Property(property: 'reason', type: 'string', example: 'Family vacation'),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 201, description: 'Leave request submitted'),
+            new OA\Response(response: 422, description: 'Validation error or insufficient balance'),
+            new OA\Response(response: 403, description: 'Forbidden'),
+        ]
+    )]
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -99,18 +102,18 @@ class LeaveController extends Controller
         return $this->success($leave->load('leaveType'), 'Leave request retrieved.');
     }
 
-    /**
-     * @OA\Delete(
-     *     path="/api/leaves/{id}",
-     *     tags={"Leaves"},
-     *     summary="Cancel a pending leave request",
-     *     security={{"bearerAuth":{}}},
-     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     *     @OA\Response(response=200, description="Leave request cancelled"),
-     *     @OA\Response(response=422, description="Cannot cancel non-pending request"),
-     *     @OA\Response(response=403, description="Forbidden")
-     * )
-     */
+    #[OA\Delete(
+        path: '/api/leaves/{id}',
+        summary: 'Cancel a pending leave request',
+        security: [['bearerAuth' => []]],
+        tags: ['Leaves'],
+        parameters: [new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
+        responses: [
+            new OA\Response(response: 200, description: 'Leave request cancelled'),
+            new OA\Response(response: 422, description: 'Cannot cancel non-pending request'),
+            new OA\Response(response: 403, description: 'Forbidden'),
+        ]
+    )]
     public function destroy(Request $request, LeaveRequest $leave)
     {
         if ($leave->user_id !== $request->user()->id) {
@@ -131,16 +134,16 @@ class LeaveController extends Controller
         return $this->success(LeaveType::orderBy('name')->get(), 'Leave types retrieved.');
     }
 
-    /**
-     * @OA\Get(
-     *     path="/api/leave-balance",
-     *     tags={"Leaves"},
-     *     summary="Get my leave balance for current year",
-     *     security={{"bearerAuth":{}}},
-     *     @OA\Response(response=200, description="Leave balances retrieved"),
-     *     @OA\Response(response=403, description="Forbidden")
-     * )
-     */
+    #[OA\Get(
+        path: '/api/leave-balance',
+        summary: 'Get my leave balance for current year',
+        security: [['bearerAuth' => []]],
+        tags: ['Leaves'],
+        responses: [
+            new OA\Response(response: 200, description: 'Leave balances retrieved'),
+            new OA\Response(response: 403, description: 'Forbidden'),
+        ]
+    )]
     public function balance(Request $request)
     {
         $balances = LeaveBalance::where('user_id', $request->user()->id)

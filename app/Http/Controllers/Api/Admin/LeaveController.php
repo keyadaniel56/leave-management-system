@@ -8,24 +8,27 @@ use App\Http\Traits\ApiResponse;
 use App\Models\LeaveBalance;
 use App\Models\LeaveRequest;
 use Illuminate\Http\Request;
+use OpenApi\Attributes as OA;
 
 class LeaveController extends Controller
 {
     use ApiResponse;
 
-    /**
-     * @OA\Get(
-     *     path="/api/admin/leaves",
-     *     tags={"Admin - Leaves"},
-     *     summary="Get all leave requests",
-     *     security={{"bearerAuth":{}}},
-     *     @OA\Parameter(name="status", in="query", required=false,
-     *         @OA\Schema(type="string", enum={"pending","approved","rejected","all"})
-     *     ),
-     *     @OA\Response(response=200, description="Leave requests retrieved"),
-     *     @OA\Response(response=403, description="Forbidden")
-     * )
-     */
+    #[OA\Get(
+        path: '/api/admin/leaves',
+        summary: 'Get all leave requests',
+        security: [['bearerAuth' => []]],
+        tags: ['Admin - Leaves'],
+        parameters: [
+            new OA\Parameter(name: 'status', in: 'query', required: false,
+                schema: new OA\Schema(type: 'string', enum: ['pending', 'approved', 'rejected', 'all'])
+            ),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Leave requests retrieved'),
+            new OA\Response(response: 403, description: 'Forbidden'),
+        ]
+    )]
     public function index(Request $request)
     {
         $status = $request->query('status', 'pending');
@@ -51,23 +54,23 @@ class LeaveController extends Controller
         );
     }
 
-    /**
-     * @OA\Post(
-     *     path="/api/admin/leaves/{id}/approve",
-     *     tags={"Admin - Leaves"},
-     *     summary="Approve a leave request",
-     *     security={{"bearerAuth":{}}},
-     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     *     @OA\RequestBody(
-     *         @OA\JsonContent(
-     *             @OA\Property(property="admin_note", type="string", example="Approved. Enjoy your leave.")
-     *         )
-     *     ),
-     *     @OA\Response(response=200, description="Leave request approved"),
-     *     @OA\Response(response=422, description="Already reviewed"),
-     *     @OA\Response(response=403, description="Forbidden")
-     * )
-     */
+    #[OA\Post(
+        path: '/api/admin/leaves/{id}/approve',
+        summary: 'Approve a leave request',
+        security: [['bearerAuth' => []]],
+        tags: ['Admin - Leaves'],
+        parameters: [new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
+        requestBody: new OA\RequestBody(
+            content: new OA\JsonContent(
+                properties: [new OA\Property(property: 'admin_note', type: 'string', example: 'Approved.')]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: 'Leave request approved'),
+            new OA\Response(response: 422, description: 'Already reviewed'),
+            new OA\Response(response: 403, description: 'Forbidden'),
+        ]
+    )]
     public function approve(Request $request, LeaveRequest $leave)
     {
         if ($leave->status !== 'pending') {
@@ -93,23 +96,23 @@ class LeaveController extends Controller
         return $this->success($leave, 'Leave request approved.');
     }
 
-    /**
-     * @OA\Post(
-     *     path="/api/admin/leaves/{id}/reject",
-     *     tags={"Admin - Leaves"},
-     *     summary="Reject a leave request",
-     *     security={{"bearerAuth":{}}},
-     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     *     @OA\RequestBody(
-     *         @OA\JsonContent(
-     *             @OA\Property(property="admin_note", type="string", example="Not enough team coverage.")
-     *         )
-     *     ),
-     *     @OA\Response(response=200, description="Leave request rejected"),
-     *     @OA\Response(response=422, description="Already reviewed"),
-     *     @OA\Response(response=403, description="Forbidden")
-     * )
-     */
+    #[OA\Post(
+        path: '/api/admin/leaves/{id}/reject',
+        summary: 'Reject a leave request',
+        security: [['bearerAuth' => []]],
+        tags: ['Admin - Leaves'],
+        parameters: [new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
+        requestBody: new OA\RequestBody(
+            content: new OA\JsonContent(
+                properties: [new OA\Property(property: 'admin_note', type: 'string', example: 'Not enough coverage.')]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: 'Leave request rejected'),
+            new OA\Response(response: 422, description: 'Already reviewed'),
+            new OA\Response(response: 403, description: 'Forbidden'),
+        ]
+    )]
     public function reject(Request $request, LeaveRequest $leave)
     {
         if ($leave->status !== 'pending') {

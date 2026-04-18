@@ -10,30 +10,33 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
+use OpenApi\Attributes as OA;
 
 class AuthController extends Controller
 {
     use ApiResponse;
 
-    /**
-     * @OA\Post(
-     *     path="/api/register",
-     *     tags={"Auth"},
-     *     summary="Register a new employee",
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             required={"name","email","password","password_confirmation"},
-     *             @OA\Property(property="name", type="string", example="John Doe"),
-     *             @OA\Property(property="email", type="string", example="john@example.com"),
-     *             @OA\Property(property="password", type="string", example="password"),
-     *             @OA\Property(property="password_confirmation", type="string", example="password")
-     *         )
-     *     ),
-     *     @OA\Response(response=201, description="Registration successful"),
-     *     @OA\Response(response=422, description="Validation error")
-     * )
-     */
+    #[OA\Post(
+        path: '/api/register',
+        summary: 'Register a new employee',
+        tags: ['Auth'],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['name', 'email', 'password', 'password_confirmation'],
+                properties: [
+                    new OA\Property(property: 'name', type: 'string', example: 'John Doe'),
+                    new OA\Property(property: 'email', type: 'string', example: 'john@example.com'),
+                    new OA\Property(property: 'password', type: 'string', example: 'password'),
+                    new OA\Property(property: 'password_confirmation', type: 'string', example: 'password'),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 201, description: 'Registration successful'),
+            new OA\Response(response: 422, description: 'Validation error'),
+        ]
+    )]
     public function register(Request $request)
     {
         $validated = $request->validate([
@@ -50,8 +53,6 @@ class AuthController extends Controller
         ]);
 
         $token = $user->createToken('api-token')->plainTextToken;
-
-        // Seed leave balances for new employee
         app(LeaveBalanceService::class)->seedBalancesForUser($user);
 
         return $this->success(['user' => $user, 'token' => $token], 'Registration successful.', 201);
@@ -59,7 +60,6 @@ class AuthController extends Controller
 
     public function registerAdmin(Request $request)
     {
-        // Disable endpoint once an admin already exists
         if (User::where('role', 'admin')->exists()) {
             abort(404);
         }
@@ -87,23 +87,25 @@ class AuthController extends Controller
         return $this->success(['user' => $user, 'token' => $token], 'Admin registered successfully.', 201);
     }
 
-    /**
-     * @OA\Post(
-     *     path="/api/login",
-     *     tags={"Auth"},
-     *     summary="Login and get access token",
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             required={"email","password"},
-     *             @OA\Property(property="email", type="string", example="admin@leave.com"),
-     *             @OA\Property(property="password", type="string", example="password")
-     *         )
-     *     ),
-     *     @OA\Response(response=200, description="Login successful"),
-     *     @OA\Response(response=422, description="Invalid credentials")
-     * )
-     */
+    #[OA\Post(
+        path: '/api/login',
+        summary: 'Login and get access token',
+        tags: ['Auth'],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['email', 'password'],
+                properties: [
+                    new OA\Property(property: 'email', type: 'string', example: 'admin@leave.com'),
+                    new OA\Property(property: 'password', type: 'string', example: 'password'),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: 'Login successful'),
+            new OA\Response(response: 422, description: 'Invalid credentials'),
+        ]
+    )]
     public function login(Request $request)
     {
         $request->validate([
@@ -124,16 +126,16 @@ class AuthController extends Controller
         return $this->success(['user' => $user, 'token' => $token], 'Login successful.');
     }
 
-    /**
-     * @OA\Post(
-     *     path="/api/logout",
-     *     tags={"Auth"},
-     *     summary="Logout and revoke token",
-     *     security={{"bearerAuth":{}}},
-     *     @OA\Response(response=200, description="Logged out successfully"),
-     *     @OA\Response(response=401, description="Unauthenticated")
-     * )
-     */
+    #[OA\Post(
+        path: '/api/logout',
+        summary: 'Logout and revoke token',
+        security: [['bearerAuth' => []]],
+        tags: ['Auth'],
+        responses: [
+            new OA\Response(response: 200, description: 'Logged out successfully'),
+            new OA\Response(response: 401, description: 'Unauthenticated'),
+        ]
+    )]
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
@@ -141,16 +143,16 @@ class AuthController extends Controller
         return $this->success(null, 'Logged out successfully.');
     }
 
-    /**
-     * @OA\Get(
-     *     path="/api/me",
-     *     tags={"Auth"},
-     *     summary="Get authenticated user",
-     *     security={{"bearerAuth":{}}},
-     *     @OA\Response(response=200, description="Authenticated user retrieved"),
-     *     @OA\Response(response=401, description="Unauthenticated")
-     * )
-     */
+    #[OA\Get(
+        path: '/api/me',
+        summary: 'Get authenticated user',
+        security: [['bearerAuth' => []]],
+        tags: ['Auth'],
+        responses: [
+            new OA\Response(response: 200, description: 'Authenticated user retrieved'),
+            new OA\Response(response: 401, description: 'Unauthenticated'),
+        ]
+    )]
     public function me(Request $request)
     {
         return $this->success($request->user(), 'Authenticated user retrieved.');
