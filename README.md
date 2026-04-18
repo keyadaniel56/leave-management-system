@@ -421,14 +421,23 @@ Tests: 16 passed (31 assertions)
 
 ## API Documentation (Swagger UI)
 
-Interactive API documentation is available at:
+Interactive API documentation is available locally at:
 
 ```
 http://127.0.0.1:8000/api/documentation
+```
+
+Or view it online without installing anything:
+
+1. Go to [https://petstore.swagger.io](https://petstore.swagger.io)
+2. Paste this URL in the top bar and click Explore:
+```
+https://raw.githubusercontent.com/keyadaniel56/leave-management-system/main/public/api-docs.json
 ```
 
 To regenerate the docs after making changes:
 
 ```bash
 php artisan l5-swagger:generate
+cp storage/api-docs/api-docs.json public/api-docs.json
 ```
