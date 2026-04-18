@@ -416,3 +416,19 @@ PASS  Tests\Feature\LeaveRequestTest
 
 Tests: 16 passed (31 assertions)
 ```
+
+---
+
+## API Documentation (Swagger UI)
+
+Interactive API documentation is available at:
+
+```
+http://127.0.0.1:8000/api/documentation
+```
+
+To regenerate the docs after making changes:
+
+```bash
+php artisan l5-swagger:generate
+```
